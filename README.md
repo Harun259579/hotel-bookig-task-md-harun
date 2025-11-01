@@ -1,66 +1,161 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hotel Booking (Laravel Add-on)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Purpose:** This drop-in add-on lets you spin up a simple hotel booking system quickly inside a fresh Laravel app.  
+**Stack:** Laravel 10+, PHP 8.2+, MySQL/MariaDB (or SQLite), Bootstrap 5
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ✨ Features
+- **Room Categories (seeded):**
+  - Premium Deluxe – 12,000 BDT
+  - Super Deluxe – 10,000 BDT
+  - Standard Deluxe – 8,000 BDT
+- **Weekend Pricing:** Friday and Saturday add **+20%** to the base price.
+- **Long-Stay Discount:** **10% off** the **subtotal** for **3 or more consecutive nights**.
+- **Availability Rules:**
+  - **3 rooms per category per day.**
+  - If a category has 3 bookings on a date → that category is unavailable for that date (**“No room available.”** in UI).
+  - If **all categories** are fully booked on a date → that date is disabled via API in the booking form.
+- **Validation / Edge Cases:**
+  - Valid email (`email` rule).
+  - Phone basic regex: `^[0-9+\-\s]{7,15}$`
+  - Booking dates cannot be in the past.
+  - Price is calculated **per day**, weekend rule applied correctly, long-stay discount applied on the subtotal.
+- **Flow:**
+  1) Enter Name/Email/Phone, From/To dates  
+  2) Check availability → see categories with pricing breakdown  
+  3) Choose a category → see final price  
+  4) Confirm → **Thank You** page shows full breakdown (Base, Weekend Surcharge, Discount, Final)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🧰 Prerequisites
+- PHP **8.2+**
+- Composer
+- MySQL/MariaDB (or SQLite)
+- Git (optional)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🚀 Installation (Step-by-step)
+> Use this when running as a **new** project.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1) **Create a new Laravel project**
+```bash
+composer create-project laravel/laravel hotel-booking
+cd hotel-booking
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2) **Copy files from the ZIP**  
+Unzip `hotel_booking_addon.zip` and **copy/merge** all files into your Laravel project root (allow overwrite):
+```
+app/Models/RoomCategory.php
+app/Models/Booking.php
+app/Models/BookingItem.php
+app/Http/Controllers/BookingController.php
+database/migrations/*create_room_categories_table.php
+database/migrations/*create_bookings_table.php
+database/migrations/*create_booking_items_table.php
+database/seeders/RoomCategorySeeder.php
+resources/views/layouts/app.blade.php
+resources/views/booking/form.blade.php
+resources/views/booking/select.blade.php
+resources/views/booking/thankyou.blade.php
+routes/web.php
+```
 
-## Laravel Sponsors
+3) **Configure the database**  
+Edit `.env` (example – MySQL):
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=hotel_booking
+DB_USERNAME=root
+DB_PASSWORD=
+```
+> Create the `hotel_booking` database in MySQL first.  
+> For SQLite: set `DB_CONNECTION=sqlite` and create `database/database.sqlite`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+4) **Register the seeder**  
+In `database/seeders/DatabaseSeeder.php`, inside `run()` add:
+```php
+$this->call(\Database\Seeders\RoomCategorySeeder::class);
+```
 
-### Premium Partners
+5) **Run migrations and seeders**
+```bash
+php artisan migrate --seed
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+6) **Start the local server**
+```bash
+php artisan serve
+```
+Open: `http://127.0.0.1:8000/booking`
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧪 How to Test
+1. Fill **Name, Email, Phone** (phone must match `^[0-9+\-\s]{7,15}$`).  
+2. Pick **From Date** and **To Date** (past dates are not allowed).  
+3. Click **Check availability** → you’ll see 3 categories with pricing breakdowns.  
+4. Pick one that is available → check the **Final total** (Base + Weekend surcharge − Discount).  
+5. Click **Confirm** → the **Thank You** page shows full details and pricing breakdown.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🔍 Routes & Endpoints
+- `GET /booking` → Booking form  
+- `POST /booking/check` → Availability + pricing view  
+- `POST /booking/confirm` → Confirm a booking  
+- `GET /booking/thank-you/{booking}` → Thank You page  
+- `GET /api/disabled-dates` → Dates where **all categories** are fully booked (JSON list)
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🧠 Pricing Logic (in `BookingController`)
+- **Weekend (Fri/Sat):** day price = base × 1.20  
+- **Base total:** sum of base price across nights  
+- **Weekend surcharge:** (weekend-inflated subtotal − base total)  
+- **Discount:** if nights ≥ 3 → 10% of subtotal  
+- **Final:** subtotal − discount
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🧱 Availability Logic
+- `booking_items` stores **one row per night** (category + date).  
+- If a date has **count ≥ 3** for a category → that category has no rooms left on that date.  
+- If a date has **all categories** at capacity → it becomes a **fully booked date** returned by `/api/disabled-dates` and the form blocks that date range.
+
+---
+
+## 📁 Key Files
+- **Models:** `RoomCategory`, `Booking`, `BookingItem`  
+- **Controller:** `BookingController` (availability + pricing + booking)  
+- **Migrations:** `room_categories`, `bookings`, `booking_items`  
+- **Seeder:** `RoomCategorySeeder` (inserts the 3 categories)  
+- **Views:** `booking/form`, `booking/select`, `booking/thankyou` (Bootstrap UI)  
+- **Routes:** `routes/web.php`
+
+---
+
+## ⚙️ Customization
+- Change room quota: `BookingController::ROOMS_PER_CATEGORY_PER_DAY`  
+- Change weekend days: adjust `calculatePricing()` checks for `isFriday()` / `isSaturday()`  
+- Tighten phone regex: update validation in `check()` / `confirm()`
+
+---
+
+## ❗ Troubleshooting
+- **Class "Database\Seeders\RoomCategorySeeder" not found**  
+  → Ensure you added the `call()` line in `DatabaseSeeder.php`, then run `composer dump-autoload` and `php artisan migrate --seed`.
+- **SQL/DB connection errors**  
+  → Verify `.env` credentials and that MySQL is running.
+- **404 or view not found**  
+  → Ensure routes and view files were copied correctly.
+
+---
+
+## 📜 License
+Use and modify this example code as you wish for your projects.
