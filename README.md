@@ -1,7 +1,7 @@
-# Hotel Booking (Laravel Add-on)
+# Hotel Booking (Laravel)
 
-**Purpose:** This drop-in add-on lets you spin up a simple hotel booking system quickly inside a fresh Laravel app.  
-**Stack:** Laravel 10+, PHP 8.2+, MySQL/MariaDB (or SQLite), Bootstrap 5
+**Purpose:**  A simple hotel booking system quickly inside a fresh Laravel app.  
+**Stack:** Laravel 9+, PHP 8.2+, MySQL/MariaDB (or SQLite), Bootstrap 5
 
 ---
 
